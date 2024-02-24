@@ -1,63 +1,57 @@
 #include "deck.h"
-#include <stddef.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
+/**
+ * swap_nodes - Swap two nodes in a doubly linked list
+ * @a: First node
+ * @b: Second node
+ */
+void swap_nodes(deck_node_t *a, deck_node_t *b)
+{
+    if (a->prev)
+        a->prev->next = b;
+    if (b->next)
+        b->next->prev = a;
+
+    a->next = b->next;
+    b->prev = a->prev;
+    a->prev = b;
+    b->next = a;
+
+    if (a->next)
+        a->next->prev = a;
+}
+
+/**
+ * sort_deck - Sort a deck of cards
+ * @deck: Pointer to the deck to be sorted
+ */
 void sort_deck(deck_node_t **deck)
 {
-    deck_node_t *current, *temp;
-    size_t i;
+    deck_node_t *current;
+    int swapped;
 
     if (deck == NULL || *deck == NULL)
         return;
 
-    for (current = *deck; current->next != NULL; current = current->next)
-    {
-        for (temp = current->next; temp != NULL; temp = temp->next)
-        {
-            if ((current->card->kind > temp->card->kind) ||
-                (current->card->kind == temp->card->kind &&
-                 strcmp(current->card->value, temp->card->value) > 0))
-            {
-                if (current->prev != NULL)
-                    current->prev->next = temp;
-                else
-                    *deck = temp;
+    do {
+        swapped = 0;
+        current = *deck;
 
-                if (temp->prev != NULL)
-                    temp->prev->next = current;
-                else
-                    *deck = current;
-
-                if (current->next != NULL)
-                    current->next->prev = temp;
-
-                if (temp->next != NULL)
-                    temp->next->prev = current;
-
-                temp->prev = current->prev;
-                current->prev = temp;
-
-                temp->next = current->next;
-                current->next = temp;
-
-                temp = current;
+        while (current->next != NULL) {
+            if (strcmp(current->card->value, current->next->card->value) > 0 ||
+                (strcmp(current->card->value, current->next->card->value) == 0 &&
+                 current->card->kind > current->next->card->kind)) {
+                swap_nodes(current, current->next);
+                if (*deck == current)
+                    *deck = current->prev;
+                swapped = 1;
+            } else {
+                current = current->next;
             }
         }
-    }
-
-    for (i = 0; *deck && i < 3; i++)
-    {
-        current = *deck;
-        while (current->next)
-            current = current->next;
-        printf("{%s, %c}", current->card->value, "SHCD"[current->card->kind]);
-        if (i < 2)
-            printf(", ");
-        else
-            printf("\n");
-        current = current->prev;
-    }
+    } while (swapped);
 }
 
