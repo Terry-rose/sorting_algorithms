@@ -1,0 +1,6 @@
+O-Notation for Counting Sort Algorithm:
+
+In the best case: O(n + k)
+In the average case: O(n + k)
+In the worst case: O(n + k)
+
